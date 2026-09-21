@@ -1,0 +1,9 @@
+# 构建产物 —— 由 make 生成，不进版本库
+kernel/*.o
+kernel/kernel
+
+# macOS 目录元数据
+.DS_Store
+
+# 提交压缩包
+提交-lab1-*.zip
