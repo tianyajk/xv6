@@ -1,14 +1,47 @@
 /*
- * lab1 初始骨架代码(自动生成): 系统启动与串口控制台输出。
- * 启动至此的前期初始化流程，需要由你在本实验中设计并实现。
- * 你需要实现: entry.S(start 前的 M 态准备可另置 start.c)、串口轮询输出、
- * 最小 printf。链接脚本 kernel.ld 带注释保留; 底层宏 riscv.h 完整保留。
- * 代码导读路线与设计引导问题详见《实验说明书(lab1)》。
+ * lab1 · console.c —— 控制台输出层（第 3 步：先只点亮一个字符）
+ * ============================================================================
+ * UART 16550 轮询输出协议（设计笔记思考题 5）
  *
- * 两个环境注意事项(说明书 §2"环境前置条件"与附录 C, 动手前必读):
- *  1. start() 的 M→S 切换清单必须包含 PMP 配置(最简两行):
- *       w_pmpaddr0(0x3fffffffffffffull); w_pmpcfg0(0xf);
- *     否则在新版 QEMU 上 mret 进 S 态的第一条取指即触发 fault(全程无输出)。
- *  2. entry.S 里的陷阱向量标号前加 .balign 4(mtvec 要求 4 字节对齐,
- *     不满足时写入会被硬件静默丢弃)。
+ * 硬件事实（来自 memlayout.h，不可改）：
+ *   基地址 UART0 = 0x10000000（QEMU virt 规范，全班统一）
+ *   寄存器按字节偏移编址，本文件只用到两个：
+ *     偏移 0  THR —— 发送保持寄存器。往这里写一个字节 = 发出一个字符
+ *     偏移 5  LSR —— 线路状态寄存器。读它判断"能不能发"
+ *
+ * 状态机：
+ *   循环忙等 LSR 的 bit5（THRE，发送保持寄存器空）变为 1，
+ *   然后向 THR 写入字符。
+ *
+ * 为什么是忙等而不是 sleep：
+ *   启动期间没有使能任何中断、也没有时钟，睡眠后没人能唤醒你 ——
+ *   忙等是此刻唯一可靠的行为。lab2 引入中断后才会换成 sleep/wakeup。
+ *
+ * 并发假设：启动早期只有单核、单上下文在调用，声明不可重入。
+ * ============================================================================
  */
+#include "types.h"
+#include "riscv.h"
+#include "memlayout.h"
+#include "course_sid.h"
+
+#define THR 0 /* 写：发送保持寄存器 (Transmit Holding Register) */
+#define LSR 5 /* 读：线路状态寄存器 (Line Status Register)       */
+
+#define LSR_TX_IDLE (1 << 5) /* bit5 = THRE，置 1 表示可以写下一个字符 */
+
+/* 把"物理地址 + 偏移"变成可解引用的指针。
+ * volatile 不可省：编译器不知道这个地址背后是硬件而不是内存，
+ * 没有它，优化器会把"重复读同一个地址"合并成一次，忙等就变成死循环。 */
+#define Reg(reg) ((volatile unsigned char *)(UART0 + (reg)))
+#define ReadReg(reg) (*(Reg(reg)))
+#define WriteReg(reg, v) (*(Reg(reg)) = (v))
+
+/* 本函数只负责"单字节硬件发射"。学号 banner 的个性化修饰在上层做（层次分明）。*/
+void
+uartputc_sync(char c)
+{
+  while ((ReadReg(LSR) & LSR_TX_IDLE) == 0)
+    ;                /* 忙等：发送器还忙着，写进去会被丢 */
+  WriteReg(THR, c);  /* 此刻 THR 空，字符落进硬件 */
+}
