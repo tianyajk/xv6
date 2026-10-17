@@ -1,0 +1,201 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lab0 · 看见操作系统</title><style>*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f3f5f6;color:#183044;font:15px/1.7 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}header{padding:20px 5vw;border-bottom:1px solid #dce3e6;display:flex;justify-content:space-between;background:#fff}header b{letter-spacing:2px}header small{color:#6e818f}.wrap{max-width:1240px;margin:auto;padding:48px 32px}.eyebrow{font:12px monospace;letter-spacing:3px;color:#397e80}h1{font-size:clamp(34px,5vw,62px);line-height:1.2;margin:16px 0}h1 span{color:#32858a}h2{font-size:28px;margin:8px 0 14px}h3{margin:6px 0}p{color:#607483}.intro{max-width:730px}.tabs{display:flex;gap:12px;flex-wrap:wrap;margin:32px 0}.tabs button,.ctl button{background:white;border:1px solid #cfdce0;border-radius:8px;padding:12px 20px;color:#29465b}.tabs button[aria-selected=true],.ctl .primary{background:#173e53;color:white;border-color:#173e53}section[hidden]{display:none}.panel{background:white;border:1px solid #dce4e7;border-radius:16px;padding:28px;margin:18px 0}.heading{display:flex;justify-content:space-between;align-items:center;gap:20px}.num{font:52px/1 monospace;color:#d2dfe2}.legend{display:flex;gap:18px;color:#677d89;font-size:13px}.badge{display:inline-block;background:#e0f1ee;color:#1e786f;border-radius:5px;padding:2px 9px;font:12px/1.8 monospace}.badge.s{background:#e7edf7;color:#385d8c}.badge.irq{background:#fff0dc;color:#a76519}.flow{display:grid;grid-template-columns:1fr 1fr;gap:14px}.node{position:relative;text-align:left;border:1px solid #dbe5e8;background:#fafcfc;border-radius:10px;padding:20px;transition:.2s}.node:hover,.node.active{border-color:#34888a;background:#edf7f5}.node .seq{float:right;color:#8ba3ae;font:13px monospace}.node code{display:block;font-size:12px;color:#67818f;margin-top:10px;overflow-wrap:anywhere}.node:last-child{grid-column:1/-1}.insight{border-left:3px solid #dfab60;padding:12px 20px;background:#fff8ec;margin-top:20px}.split{display:grid;grid-template-columns:1.15fr 1fr;gap:24px}.procs{display:flex;align-items:center;gap:10px}.proc{flex:1;border:1px solid #d4e0e5;border-radius:9px;padding:18px 12px;text-align:center}.proc strong{display:block;font-size:21px}.proc small{display:block;color:#647d89}.arrow{color:#4a8b8b;font-size:22px}.wire{text-align:center;color:#398785;padding:8px}.shared{border:1px solid #77a8a2;background:#edf7f4;padding:18px;border-radius:10px;text-align:center}.memory{display:flex;flex-direction:column;gap:6px}.mem{display:flex;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:6px;background:#eaf0f6;font-size:13px}.mem:nth-child(2){background:#e1f1ee}.mem.hole{background:repeating-linear-gradient(135deg,#fafbfc,#fafbfc 7px,#edf1f3 7px,#edf1f3 8px);padding:24px 14px}.mem.guard{background:#fff1dc}.mem code{font-size:11px}.note{font-size:13px;color:#647c88}.checks{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.checks article{padding:20px;border-top:2px solid #338688;background:#f4f8f8}.checks p{font-size:13px}.timeline{display:flex;gap:6px;margin:24px 0}.timeline button{flex:1;border:0;background:#e5ecef;height:9px;border-radius:8px;padding:0}.timeline button.active{background:#2d8587}.stage{background:#163b50;color:white;border-radius:12px;padding:32px;min-height:220px}.stage p{color:#d0e0e7}.stage h3{font-size:28px}.state{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}.state div{padding:14px;background:#edf3f5;border-radius:8px}.state small{display:block;color:#6f8792}.state b{font-size:15px}.ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.ctl span{margin-left:auto;color:#63808c}details{border-top:1px solid #d9e2e5;padding:16px 0}summary{cursor:pointer;font-weight:600}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.8 monospace;padding:20px;background:#f5f7f8;max-height:520px;overflow:auto}footer{padding:32px 0;color:#7a8d98;font-size:12px}button:focus-visible,a:focus-visible{outline:3px solid #de9c45;outline-offset:4px}@media(max-width:760px){.wrap{padding:28px 18px}.panel{padding:20px}.flow,.split,.checks{grid-template-columns:1fr}.state{grid-template-columns:1fr}.procs{gap:5px}.proc{padding:12px 5px}.proc strong{font-size:17px}header small{display:none}.tabs button{flex:1;padding:10px}.heading{align-items:flex-start}.num{font-size:36px}}@media print{header,.tabs,.ctl,.timeline{display:none}section[hidden]{display:block}.panel{break-inside:avoid}.wrap{padding:0}body{background:white}.source pre{max-height:none}.flow{grid-template-columns:1fr 1fr}}</style></head><body><header><b>MyOS / LAB 00</b><small>XV6 SYSTEM ATLAS · 操作系统可视化手册</small></header><main class="wrap"><div class="eyebrow">FROM COMMAND TO KERNEL</div><h1>看见操作系统，<br><span>而不只是读懂箭头。</span></h1><p class="intro">从一条 echo hi 出发，把执行路径、内存关系和时钟中断拆成可观察的步骤。三张核心快照，一次建立系统全貌。</p><nav class="tabs" role="tablist" aria-label="三张核心图"><button role="tab" id="tab-flow" aria-controls="flow" aria-selected="true" data-tab="flow">01 全系统控制流</button><button role="tab" id="tab-snapshot" aria-controls="snapshot" aria-selected="false" data-tab="snapshot">02 数据结构快照</button><button role="tab" id="tab-clock" aria-controls="clock" aria-selected="false" data-tab="clock">03 时钟中断旅程</button></nav>
+<section id="flow" role="tabpanel" aria-labelledby="tab-flow"><div class="panel"><div class="heading"><div><div class="eyebrow">EXECUTION FLOW</div><h2>一条命令，如何穿过整个系统？</h2></div><span class="num">01</span></div><p>终端输入 → shell 读取 → fork / exec → UART 输出 → exit / wait。点击节点查看当前边界。</p><div class="legend"><span>U · 用户态</span><span>S · 内核态</span><span>IRQ · 外部中断</span></div><div class="flow" id="flow-nodes"></div><div class="insight" id="flow-detail" aria-live="polite"></div></div><div class="checks"><article><h3>读不到，就睡眠</h3><p>sleep_prepare 与 sleep 配合处理提前到达的 wakeup，避免丢失唤醒。</p></article><article><h3>输出是两次陷入</h3><p>hi 与换行分两次 write；不能把教学简图当成一次系统调用。</p></article><article><h3>先退出，也能回收</h3><p>子进程先退出时保留 ZOMBIE；父进程随后 wait 仍可回收。</p></article></div></section>
+<section id="snapshot" role="tabpanel" aria-labelledby="tab-snapshot" hidden><div class="panel"><div class="heading"><div><div class="eyebrow">ONE MOMENT / THREE VIEWS</div><h2>exec 提交新映像的这一瞬间</h2></div><span class="num">02</span></div><p>固定单核合法时序：父 sh 已在 wait 中睡眠，子进程刚提交 echo 新映像，仍在 S 态，尚未执行 echo 首条用户指令。</p><div class="split"><div><h3>进程与共享文件引用</h3><div class="procs"><div class="proc"><strong>init</strong><small>SLEEPING</small><small>PT_init</small></div><span class="arrow">→</span><div class="proc"><strong>sh</strong><small>SLEEPING</small><small>PT_sh</small></div><span class="arrow">→</span><div class="proc" style="background:#e3f2ee"><strong>echo</strong><small>RUNNING · S</small><small>PT_echo_new</small></div></div><p class="note">横向箭头表示创建的父子关系；每个进程的 parent 指针反向指向父进程。</p><div class="wire">各自 ofile[0] / [1] / [2] ↓ 共同引用</div><div class="shared"><strong>同一个 file 对象 F</strong><br><code>FD_DEVICE · major=1 · ref=9*</code></div><div class="wire">F.ip ↓ <span style="margin-left:24px">F.major ↘ devsw[1]</span></div><div class="shared">console 设备 inode<br><small>T_DEVICE · major=CONSOLE</small></div><p class="note">* 仅在三个进程各持 3 个描述符、无额外引用时成立。file.ref 不等于 inode.ref。</p><details><summary>点击区分：exec 换了什么？</summary><p>替换 pagetable、sz、用户 SP 与入口 PC；保留 PID、parent、ofile、cwd，以及已有内核栈和 trapframe。</p></details><details><summary>点击追踪：fd1 如何到达终端？</summary><p>ofile[1] → file(FD_DEVICE) → devsw[1].write → consolewrite → uartwrite → UART THR。不是普通文件的数据块写入。</p></details></div><div><h3>echo 虚拟地址空间 · 高 → 低</h3><div class="memory"><div class="mem"><b>TRAMPOLINE · 全进程共享代码</b><code>0x3ffffff000<br>V R X / 无 U</code></div><div class="mem"><b>TRAPFRAME · 每进程私有现场</b><code>0x3fffffe000<br>V R W / 无 U</code></div><div class="mem hole"><b>未映射空洞 / 后续堆可扩展空间</b><code>非按比例</code></div><div class="mem"><b>用户栈 · argv / 字符串 / sp</b><code>[G+0x1000,G+0x2000)<br>V R W U</code></div><div class="mem guard"><b>Guard · 有映射，但用户不可访问</b><code>[G,G+0x1000)<br>V R W / 无 U</code></div><div class="mem"><b>ELF 代码 / 数据 / BSS</b><code>低地址<br>按 PT_LOAD 标志授权</code></div></div><p class="note">G = PGROUNDUP(最后一个 PT_LOAD 段末尾)<br>sz = G + 2 × PGSIZE；它不是整张页表的顶端。</p><details><summary>点击展开：Sv39 三级查找</summary><p>虚拟地址 → L2[PX(2,va)] → L1[PX(1,va)] → L0[PX(0,va)] → 叶 PTE 的物理页号 PPN。中间 PTE 指向下一级页表；叶 PTE 携带访问权限。</p></details></div></div></div></section>
+<section id="clock" role="tabpanel" aria-labelledby="tab-clock" hidden><div class="panel"><div class="heading"><div><div class="eyebrow">INTERRUPT / STEP BY STEP</div><h2>一个 tick，现场去了哪里？</h2></div><span class="num">03</span></div><p>单核 CPU0：从 P 的用户指令出发，经过时钟处理与调度，最终回到 P。点击进度条或使用上一步／下一步。</p><div class="timeline" id="timeline"></div><div class="stage" aria-live="polite"><span class="eyebrow" style="color:#8ed2cb" id="step-label"></span><h3 id="step-title"></h3><p id="step-desc"></p></div><div class="state"><div><small>特权级</small><b id="mode"></b></div><div><small>当前页表</small><b id="pt"></b></div><div><small>当前执行栈</small><b id="stack"></b></div></div><div class="ctl"><button id="prev">← 上一步</button><button id="next" class="primary">下一步 →</button><button id="reset">回到起点</button><span id="counter"></span></div><div class="insight"><b>三个容易混淆的边界</b><br>硬件保存陷阱控制状态；trapframe 保存用户通用寄存器；context 保存内核切换续点。时钟中断返回时 epc 不加 4。</div></div></section>
+<div class="panel"><h3>原文对照与答辩笔记</h3><p class="note">以下保留三份材料完整原文。图示为本地 xv6 参考树的教学推演，不是 Lab1 裸机内核的运行录屏；PID 与物理页号使用符号表示。</p><details class="source"><summary>lab0-1-全系统控制流图 · 原文与答辩批注</summary><pre># Lab0 材料一：Shell 执行 `echo hi` 的全系统控制流图
+
+**观察范围**：从用户在终端输入 `echo hi` 并按回车，到屏幕出现 `hi` 与换行、子进程退出、父进程完成 `wait`。本图依据本地 `xv6-riscv` 参考树；它不是当前 Lab1 裸机内核的运行轨迹。
+
+**图例**：`U/用户栈`=用户态及当前进程用户栈；`S/进程内核栈`=S 态及当前进程内核栈；`S/调度器栈`=S 态及当前 CPU 调度器专用栈。锁栏写该节点的关键持锁；`无`表示该节点不持有自旋锁，不能理解成整个函数从不加锁。启动时 M 态只用于配置和 `mret`，下列命令链发生在 U/S 态。
+
+```mermaid
+flowchart TD
+  A[终端输入 echo hi 和回车] --&gt; B[sh getcmd/gets: read fd0 每次 1 字节\nU/用户栈; 无锁]
+  B --&gt; C[usys.S: a7=SYS_read; ecall\nU→S; 硬件保存 sepc/scause/sstatus]
+  C --&gt; D[trampoline uservec 保存通用寄存器到 trapframe\n切到 sh 内核栈和内核页表]
+  D --&gt; E[usertrap→syscall→sys_read→fileread→consoleread\nS/sh 内核栈]
+  E --&gt; F{cons.r == cons.w?}
+  F -- 是 --&gt; G[sleep_prepare &amp;cons.r; 释放 cons.lock; sleep→sched→swtch\nsh:SLEEPING; S/sh 内核栈→调度器栈]
+  G --&gt; H[scheduler 选择其他 RUNNABLE 进程\nS/调度器栈]
+  A --&gt; I[UART 收到字符，经 PLIC 外部中断]
+  I --&gt; J[devintr→uartintr→consoleintr\nS/当前被中断进程的内核栈; cons.lock]
+  J --&gt; K[回车使 cons.w=cons.e; wakeup &amp;cons.r\nsh→RUNNABLE]
+  K --&gt; L[scheduler→swtch 恢复 sh; consoleread 返回\nS/sh 内核栈→userret/sret→U]
+  H --&gt;|中断唤醒后再选中 sh| L
+  L --&gt; M[sh 解析 echo hi; fork1→fork ecall\nU→S/sh 内核栈]
+  M --&gt; N[sys_fork→kfork→uvmcopy; 复制 trapframe; filedup\n父返回子 pid; 子的 a0=0]
+  N --&gt; O[父 sh: wait ecall→kwait→sleep_prepare/sh→sleep\nS/sh 内核栈→调度器栈]
+  N --&gt; P[子 echo 前身: scheduler→forkret→userret/sret\nS/调度器栈→子内核栈→U/子用户栈]
+  P --&gt; Q[runcmd→exec echo; ecall→sys_exec→kexec\nS/子内核栈; 替换用户映像]
+  Q --&gt; R[userret/sret→echo 的 start/main\nU/echo 用户栈]
+  R --&gt; S[write 1,hi,2; write 1,换行,1\n各自经 ecall→usertrap→sys_write]
+  S --&gt; T[filewrite FD_DEVICE→devsw CONSOLE.write\n→consolewrite→uartwrite→UART THR]
+  T --&gt; U[屏幕显示 hi 和换行]
+  U --&gt; V[echo exit ecall→kexit; fileclose; ZOMBIE; wakeup sh\nS/echo 内核栈→调度器栈]
+  V --&gt; W[sh kwait 被唤醒; freeproc 回收子进程\n返回 sh 用户态并再次显示提示符]
+```
+
+## 时序与边界标注
+
+| 时序 | 当前执行体与关键调用 | 特权级／栈 | 持锁与状态变化 |
+|---|---|---|---|
+| 1 | `sh: getcmd→gets→read(0,&amp;c,1)`；每次系统调用读取一个字符 | `U/sh 用户栈` → `S/sh 内核栈` | 用户态无自旋锁；陷入硬件只记 `sepc/scause/sstatus`，`uservec` 才逐个保存通用寄存器。 |
+| 2 | `usertrap→syscall→sys_read→fileread→devsw[CONSOLE].read→consoleread` | `S/sh 内核栈` | `consoleread` 持 `cons.lock` 检查输入环形缓冲。空缓冲时登记 `&amp;cons.r`，释放 `cons.lock`，再 `sleep→sched→swtch`；`sched` 切换时只持 `sh-&gt;lock`，并将 `sh` 置为 `SLEEPING`。 |
+| 3 | 终端设备收到各字符；UART/PLIC 外部中断使当前 CPU 进 `kerneltrap` 或 `usertrap`，再经 `devintr→uartintr→consoleintr` | 被打断处若为 U 则 `uservec` 换至**被打断进程**内核栈；若为 S 则 `kernelvec` 留在其当前内核栈／调度器栈 | `consoleintr` 持 `cons.lock`；它会回显字符。回车时 `cons.w=cons.e` 并 `wakeup(&amp;cons.r)`，短暂获得各 `p-&gt;lock`，把 sh 标为 `RUNNABLE`。 |
+| 4 | 调度器再次选中 sh；`consoleread` 将字节拷给用户缓冲，读到换行返回。`usertrap→prepare_return→userret→sret` | `S/调度器栈` → `S/sh 内核栈` → `U/sh 用户栈` | `scheduler` 选进程时持该 `p-&gt;lock`，恢复后由进程侧释放；返回 U 前无自旋锁。 |
+| 5 | sh 对非内建命令执行 `fork1`；`sys_fork→kfork` | `U/sh 用户栈` → `S/sh 内核栈` | `kfork` 复制页表和 `trapframe`，`filedup` 增文件引用计数；复制父 `ofile` 指针；设置子 `a0=0`，父得到子 PID。子标记 `RUNNABLE`。 |
+| 6 | 父 sh 调用 `wait→sys_wait→kwait`；子由 `scheduler→forkret` 首次运行，回到用户态后 `runcmd` | 父：`S/sh 内核栈→调度器栈`；子：`调度器栈→S/子内核栈→U/子用户栈` | 父等待时持 `wait_lock` 扫描子进程；登记睡眠通道 `sh` 后先放 `wait_lock` 再睡。子第一次运行经 `forkret` 释放由 `scheduler` 带过来的 `p-&gt;lock`。 |
+| 7 | 子 `exec(&quot;echo&quot;, argv)`：`sys_exec→kexec` 读取 ELF，建立新页表和栈，然后替换旧地址空间 | `U/子用户栈` → `S/子内核栈` → `U/echo 用户栈` | `exec` 保留 PID、父子关系、`ofile`、`cwd`，替换 `pagetable`、`sz`、入口 PC 和用户 SP；文件系统路径上短时持 inode 睡眠锁／日志事务。 |
+| 8 | 当前树 `echo.c` 对 `hi` 调用一次 `write(1,&quot;hi&quot;,2)`，随后另一次 `write(1,&quot;\n&quot;,1)` | 各次 `U/echo 用户栈` → `S/echo 内核栈` | `sys_write→filewrite(FD_DEVICE)→consolewrite→uartwrite`。`uartwrite` 使用 **`tx_lock` 睡眠锁**串行输出，不持自旋锁睡眠；硬件暂忙则在 `&amp;tx_chan` 睡眠，由 UART 发送中断唤醒。 |
+| 9 | UART 驱动写 `THR`，终端显示 `hi\n`；echo `exit→kexit`，sh 的 `kwait` 回收它 | echo：`S/echo 内核栈→调度器栈`；sh：`S/sh 内核栈→U/sh 用户栈` | `kexit` 逐一 `fileclose`，唤醒 sh，设置 `ZOMBIE`；`kwait` 持 `wait_lock` 和子 `p-&gt;lock` 完成 `freeproc`，父重新显示提示符。 |
+
+## 三处推演批注
+
+1. **read 的阻塞边界**：`sleep_prepare` 与 `sleep` 分两步，期间 UART 中断可能先 `wakeup`。`wakeup` 清 `p-&gt;chan`，随后 `sleep()` 发现它为 0 就不真正睡下，避免丢失唤醒；sh 不会永远卡在 `read`。
+2. **输出并非单次 `write(1,&quot;hi\n&quot;,3)`**：此版本 `echo.c` 对参数与换行分开调用 `write`。图中把它们画成两次陷入，否则与源码不符。
+3. **wait 与 exit 的竞态**：如果子在父进入 `wait` 前已退出，它保持 `ZOMBIE`；`kwait` 扫描时直接回收。若父先睡下，`kexit` 的 `wakeup(p-&gt;parent)` 再唤醒父，两条路径都成立。
+
+**源码定位**：`/Users/wangjane/Desktop/xv6-riscv/user/sh.c`、`user/ulib.c`、`user/echo.c`、`user/usys.pl`、`kernel/trampoline.S`、`kernel/trap.c`、`kernel/syscall.c`、`kernel/sysfile.c`、`kernel/proc.c`、`kernel/console.c`、`kernel/uart.c`、`kernel/file.c`。
+</pre></details>
+<details class="source"><summary>lab0-2-核心数据结构全景快照 · 原文与答辩批注</summary><pre># Lab0 材料二：exec 完成后、echo 首条用户指令前的数据结构全景快照
+
+**截面定义**：选单核的一条合法时序：sh `fork` 后先进入 `wait` 并睡眠，调度器随后运行子进程；子进程在 `kexec(&quot;echo&quot;, argv)` **刚提交新映像**（`p-&gt;pagetable = pagetable; p-&gt;sz = sz;`）且尚未执行 echo 首条用户指令的瞬间。此刻 CPU 仍在子进程的 `S` 态内核栈，稍后 `sys_exec` 返回、`prepare_return→userret→sret` 才进入 echo。PID 与物理页号取决于运行时分配，因此图中使用符号，不伪造固定数值。
+
+## A. 进程表与引用全景
+
+```mermaid
+flowchart LR
+  CPU[CPU0: S态; echo 子进程内核栈] --&gt; E[proc E: echo前身; RUNNING]
+  I[proc I: init; SLEEPING 于 wait] --&gt; S[proc S: sh; SLEEPING 于 wait]
+  S --&gt;|parent| I
+  E --&gt;|parent| S
+  I --&gt;|pagetable| IPT[init 页表]
+  S --&gt;|pagetable| SPT[sh 页表]
+  E --&gt;|pagetable| EPT[新 echo 页表]
+  E --&gt;|trapframe| ETF[echo trapframe: epc=elf.entry; sp=argv栈; a1=argv]
+  E --&gt;|ofile 0,1,2| F0[共享的 console file 对象]
+  S --&gt;|ofile 0,1,2| F0
+  I --&gt;|ofile 0,1,2| F0
+  F0 --&gt;|ip| IN[console 设备 inode; T_DEVICE; major=CONSOLE=1]
+  F0 --&gt;|major| DEV[devsw 1: consoleread / consolewrite]
+```
+
+| `proc` | `state` / `parent` | `pagetable` / `sz` | `ofile[0..15]` |
+|---|---|---|---|
+| init (`I`) | `SLEEPING`，`parent=0`；本时序正等待 sh | `PT_init`；`sz_init` 为 init 映像大小，非 echo 大小 | 0、1、2 指向 console 的 `file` 对象 `F`；3–15 为 `0`，假定此时没有其他打开文件。 |
+| sh (`S`) | `SLEEPING`，`parent=I`；`chan=S`（`kwait` 等 echo） | `PT_sh`；`sz_sh` 为 sh 的用户空间大小 | 0、1、2 指向 `F`；3–15 为 `0`（命令 `echo hi` 不重定向、不建管道）。 |
+| echo 子进程 (`E`) | **`RUNNING`**，`parent=S`；尚在 `kexec` 的 S 态路径上 | `PT_echo_new`；`sz_echo=G+2×PGSIZE`，其中 `G=PGROUNDUP(最后一个 PT_LOAD 段结束 VA)`，`USERSTACK=1` | `kfork` 的 `filedup` 使 0、1、2 继续指向 `F`；`exec` 不清空文件描述符；3–15 为 `0`。 |
+
+`proc` 是全局 `proc[NPROC]` 表；每条记录还含 `pid`、`kstack`、`trapframe`、`context`、`cwd`。`E` 的内核栈与 `trapframe` 是 `allocproc` 分配的；`kexec` 用新页表替换旧页表，但不换这个内核栈。`E-&gt;trapframe-&gt;epc=elf.entry`，`sp` 指向新用户栈中的参数区，`a1` 指向 `argv`；随后 `syscall()` 把返回的 `argc` 写入 `a0`。同一时刻只有该 CPU 上的 `E` 处于 `RUNNING`；多核情况下其他状态可能不同，本图固定单核时序。
+
+## B. echo 用户页表的 Sv39 映射树
+
+`MAXVA = 0x4000000000`，`PGSIZE = 0x1000`，所以 `TRAMPOLINE = 0x3ffffff000`，`TRAPFRAME = 0x3fffffe000`。以 `[起点,终点)` 表示区间。
+
+```text
+PT_echo_new  (Sv39 根页表，satp.PPN 指向物理根页)
+├─ L2[PX(2,va)] → L1[PX(1,va)] → L0[PX(0,va)] → 低地址用户叶 PTE
+│  ├─ ELF PT_LOAD 段页：各段 [ph.vaddr, PGROUNDUP(ph.vaddr+ph.memsz))
+│  │  ├─ 代码页：V|R|X|U（若段仅可执行）；实际权限按 ELF ph.flags 转换
+│  │  └─ 数据/BSS 页：V|R|W|U（若段可写）
+│  ├─ [G, G+0x1000)       栈 guard 页：V|R|W，PTE_U=0
+│  └─ [G+0x1000,G+0x2000) 用户栈：V|R|W|U，sp 位于此页
+├─ 未映射空洞：(G+0x2000) ... 0x3fffffe000
+│  └─ 堆：本截面尚未单独分配；后续 sbrk 从当前 sz 扩展，可能出现 V|R|W|U 的页
+├─ L2/L1/L0 → [0x3fffffe000,0x3ffffff000) TRAPFRAME：V|R|W，PTE_U=0
+└─ L2/L1/L0 → [0x3ffffff000,0x4000000000) TRAMPOLINE：V|R|X，PTE_U=0
+```
+
+| 区域 | 虚拟地址与物理对象 | 权限／解释 |
+|---|---|---|
+| 代码、只读数据及可写数据 | 由 `echo` ELF 的各个 `PT_LOAD` 的 `ph.vaddr/ph.memsz/ph.flags` 决定；不能凭源码猜固定边界 | `uvmalloc` 基础权限 `V|R|U`；段若有 `EXEC` 再加 `X`，若有 `WRITE` 再加 `W`。不同段的实际权限应按 ELF 标志逐一标。 |
+| guard 页 | `[G,G+0x1000)`；物理页存在 | `uvmclear` **只清 PTE_U**，故不是完全未映射；用户访问触发异常，S 态仍可访问。 |
+| 用户栈 | `[G+0x1000,G+0x2000)`；`USERSTACK=1` | `V|R|W|U`；`sp` 在该页，字符串与 `argv` 从高地址向低地址排布。 |
+| 堆区 | `sz=G+0x2000` 以上的可扩展空间；本截面无独立堆页 | 不是把 guard 与用户栈之间误标成堆；后续 `sbrk` 才增长 `sz`，此版可能按需懒分配。 |
+| trapframe | `[0x3fffffe000,0x3ffffff000)` → `E-&gt;trapframe` 物理页 | `V|R|W`，无 `U`；trampoline 代用户在 S 态保存/恢复寄存器。 |
+| trampoline | `[0x3ffffff000,0x4000000000)` → 全进程共用 trampoline 代码物理页 | `V|R|X`，无 `U`；S 态陷入/返回路径用；**不随 fork 复制物理代码页**。 |
+
+每一个有效叶 PTE 还包含物理页号 PPN；中间级 PTE 只有 `V` 并指向下一级页表页。`proc_pagetable` 在新页表上先映射 trampoline 和 trapframe；`kexec` 再映射 ELF 和栈；旧页表在提交后释放。图中 `sz` 是进程已使用用户地址空间的高水位，**不是整张页表的顶端**，因为 trapframe/trampoline 固定在接近 `MAXVA` 的高地址。
+
+## C. 文件描述符、file 表与 inode 快照
+
+```text
+init.ofile[0] ─┐
+init.ofile[1] ─┤
+init.ofile[2] ─┤
+sh.ofile[0..2] ├──&gt; ftable.file F {type=FD_DEVICE, ref≈9,
+echo.ofile[0..2]┘                     readable=1, writable=1,
+                                      major=CONSOLE(1), ip=I_console}
+                                           │                   │
+                                           │ip                 └──&gt; devsw[1]
+                                           v                        read=consoleread
+                              inode I_console {type=T_DEVICE,     write=consolewrite
+                              major=1, minor=0, ref=...}
+                                           │
+                                           └──&gt; consolewrite→uartwrite→UART0 THR
+```
+
+`init` 启动时 `open(&quot;console&quot;,O_RDWR)` 得到 fd 0，`dup(0)` 两次得到 1、2；sh 从 init 的 `fork` 继承同一 `F`，echo 从 sh 的 `fork` 再继承它。若只有这三个进程且均未另开文件，`F.ref=9`（三个进程各三个描述符）；它是一个**条件性快照值**，而不是 inode 的 `ref`。`F.ip` 指向磁盘文件系统中代表设备节点 `console` 的 inode；`FD_DEVICE` 写操作按 `major=1` 分派到 `devsw[1].write=consolewrite`，不是按普通文件偏移写入数据块。`cwd` 各自还引用根目录 inode，与 fd1 的设备 inode 不同。
+
+## 推演批注与答辩点
+
+1. **为什么 `exec` 后还能输出到 fd1？** `kexec` 只提交新用户映像和寄存器入口；`proc.ofile` 保留。`kfork` 早已对共享 `file` 调用 `filedup`。
+2. **guard 页究竟“无效”还是“不可给用户访问”？** 此树 `uvmclear` 仅清 `PTE_U`，页仍有 `V|R|W`；“未映射 guard”是对本实现的不精确表述。
+3. **子进程退出会泄漏 stdout 吗？** `kexit` 遍历 `ofile` 执行 `fileclose`，`F.ref` 按描述符递减；最后一个引用离开时才 `iput(F.ip)`。父进程 `wait` 回收的是 `proc` 与页表，文件引用在 `exit` 已处理。
+4. **为何 trampoline 不复制物理页？** 所有进程的页表映射到同一只读可执行内核代码页；需要隔离的是每个进程自己的 trapframe 数据页。
+
+**源码定位**：`/Users/wangjane/Desktop/xv6-riscv/kernel/proc.h`、`proc.c`、`exec.c`、`vm.c`、`memlayout.h`、`riscv.h`、`file.h`、`file.c`、`sysfile.c`、`console.c`、`param.h`、`/Users/wangjane/Desktop/xv6-riscv/user/init.c`。
+</pre></details>
+<details class="source"><summary>lab0-3-一次时钟中断的微观旅程 · 原文与答辩批注</summary><pre># Lab0 材料三：一次用户态时钟中断到 `sret` 的微观旅程
+
+**选定现场**：单核 CPU0 正在 U 态运行普通用户进程 `P`，当前使用 `P` 的用户页表与用户栈；`stvec` 已由上次 `prepare_return` 指到 trampoline 的 `uservec`。时钟中断 `scause=0x8000000000000005`；可能存在其他 `RUNNABLE` 进程 `Q`。此参考树用 S 态 `stimecmp` 触发时钟中断，进入陷阱后执行主体在 **S 态**，不是全程 M 态。
+
+```mermaid
+sequenceDiagram
+  participant U as P 用户指令/U/用户栈
+  participant HW as RISC-V 硬件
+  participant TV as trampoline.S:uservec
+  participant KT as trap.c:usertrap/devintr
+  participant SC as proc.c:sched/scheduler
+  participant RT as prepare_return/userret
+  U-&gt;&gt;HW: 时钟中断到来
+  HW-&gt;&gt;TV: scause=0x800...005; sepc=受中断PC; SPP=U; SIE→SPIE; 进入S态并跳stvec
+  TV-&gt;&gt;TV: sscratch暂存a0; 保存用户通用寄存器到P.trapframe
+  TV-&gt;&gt;KT: sp=P.kstack顶部; 切内核satp; jalr usertrap
+  KT-&gt;&gt;KT: stvec=kernelvec; 保存sepc到trapframe.epc
+  KT-&gt;&gt;KT: devintr识别时钟; clockintr更新ticks/唤醒并重设stimecmp; 返回2
+  KT-&gt;&gt;SC: which_dev=2; yield: P→RUNNABLE; sched→swtch
+  SC-&gt;&gt;SC: 调度器在专用栈运行; 可选Q; 后来再选P
+  SC-&gt;&gt;KT: swtch恢复P内核context; yield返回
+  KT-&gt;&gt;RT: prepare_return: 关中断; stvec=uservec; 设置trapframe.kernel_*、SPP=U、SPIE=1、sepc
+  RT-&gt;&gt;TV: usertrap返回用户satp; userret切用户页表并恢复通用寄存器
+  TV-&gt;&gt;U: sret: PC=sepc; 恢复U态中断状态; 从原指令位置继续
+```
+
+## 逐步状态记录
+
+| 步骤 | 动作与寄存器／内存变化 | 特权级、页表、栈、锁 |
+|---|---|---|
+| 0 | `P` 正在用户指令流；`satp=P.pagetable`，`stvec=uservec`，`sscratch` 可由入口使用。 | `U`、`P` 用户页表、`P` 用户栈、无自旋锁。 |
+| 1 **硬件陷入** | 硬件将当前 PC 写入 `sepc`，把中断原因写入 `scause=0x8000000000000005`，`sstatus.SPP` 记录原模式 U，`SPIE←SIE`，清 `SIE`，切到 S 态并跳 `stvec`。**硬件不会自动切栈、切页表，也不会保存全部通用寄存器。** | 刚到 `uservec` 时是 `S` 态，但仍在 `P` 用户页表、原用户 `sp`；无锁。 |
+| 2 **汇编保存** | `uservec` 先用 `sscratch` 暂存用户 `a0`，将 `a0=TRAPFRAME`；把 `ra/sp/gp/tp/t0...t6` 等用户通用寄存器写到 `P.trapframe`，最后将原 `a0` 存入偏移 112。 | `S`，仍使用 `P` 用户页表；trapframe 是 `P` 私有页的高地址映射，`PTE_U=0`，S 态可写；尚未用内核栈。 |
+| 3 **转到 C** | 从 trapframe 取 `kernel_sp/kernel_hartid/kernel_trap/kernel_satp`；`sp=P.kstack+PGSIZE`，`tp=hartid`；`sfence.vma`，写 `satp=kernel_satp`，再 `sfence.vma`，`jalr usertrap`。 | `S`、内核页表、`P` 内核栈；无自旋锁。trampoline 在两套页表同一 VA 映射，切页表前后均可执行。 |
+| 4 **分类中断** | `usertrap` 验证来自 U 态，将 `stvec` 改为 `kernelvec`，保存 `sepc` 到 `P.trapframe-&gt;epc`；`devintr` 匹配时钟中断，调用 `clockintr`。CPU0 更新 `ticks`，唤醒等待 tick 的进程，重设 `stimecmp=r_time()+1000000`，返回 `which_dev=2`。 | `S/P` 内核栈；`clockintr` 更新 `ticks` 时短暂持 `tickslock`，`wakeup(&amp;ticks)` 可能短暂持被检查进程的 `p-&gt;lock`；返回后均已释放。 |
+| 5 **主动让步** | `usertrap` 看到 `which_dev==2` 调 `yield`；`yield` 持 `P-&gt;lock` 将 `P-&gt;state=RUNNABLE`；`sched` 验证只持这把锁且中断关闭；`swtch(&amp;P-&gt;context,&amp;cpu-&gt;context)` 仅保存/恢复内核 callee-saved 寄存器、`ra/sp`。 | `S/P` 内核栈 → `S/CPU 调度器栈`；切换交接期间持 `P-&gt;lock`，调度器返回该 `swtch` 后释放。**用户完整现场在 trapframe，不在 context。** |
+| 6 **调度决定** | `scheduler` 扫描 `proc[NPROC]`，逐个持 `p-&gt;lock` 找 `RUNNABLE`，标 `RUNNING` 并 `swtch`。可先运行 `Q`，也可稍后再次选择 `P`；不保证这次 tick 一定换到别的进程。 | `S/调度器栈`；选中进程时持它的 `p-&gt;lock`，新进程侧负责放锁。 |
+| 7 **恢复 P 的内核续点** | 某次扫描再次选中 `P`，`swtch` 读回 `P-&gt;context`，从先前 `sched` 的调用点继续；`sched→yield` 返回，`yield` 释放 `P-&gt;lock`，回到 `usertrap`。 | `S/P` 内核栈、内核页表；释放后无自旋锁。 |
+| 8 **准备返 U** | `prepare_return` 关中断，将 `stvec` 指回 trampoline `uservec`；将下次陷入需要的 `kernel_satp/kernel_sp/kernel_trap/kernel_hartid` 写入 `P.trapframe`；设置 `sstatus.SPP=0`、`SPIE=1`，`sepc=P.trapframe-&gt;epc`。`usertrap` 返回 `MAKE_SATP(P.pagetable)` 给 `userret`。 | `S/P` 内核栈、内核页表；无自旋锁。时钟中断不是 `ecall`，**`epc` 不加 4**。 |
+| 9 **汇编返 U** | `userret` 执行 `fence.i`、切到 `P` 用户页表并刷新 TLB，按 trapframe 恢复用户通用寄存器和 `sp`，最后恢复 `a0`；执行 `sret`。硬件按 `sepc` 恢复 PC，按 `SPP=0` 进入 U 态，并由 `SPIE` 恢复中断使能。 | `S` 的 trampoline → `U/P` 用户页表与用户栈；无自旋锁；继续执行被中断位置。 |
+
+## 现场区分与推演批注
+
+1. **硬件与软件各保存什么？** 硬件自动处理 `sepc/scause/sstatus` 等陷阱控制状态，`trampoline.S` 负责全部通用寄存器；`swtch.S` 只负责内核上下文，因此不能拿 `context` 代替 `trapframe`。
+2. **为什么不能像系统调用那样 `epc += 4`？** 时钟中断异步发生，硬件记录的是应当继续执行的用户 PC；回到硬件提供的 `sepc` 才能保持连续性。此树只在 `r_scause()==8` 的 `ecall` 分支把 PC 加 4。
+3. **为什么返回前要重新写 `stvec`？** 内核期间若再次陷入应进 `kernelvec`；返 U 前改回 `uservec`，下一次用户陷入才能通过 trapframe 安全换栈和页表。
+4. **为什么 `yield` 不等于“必定换人”？** `scheduler` 只按扫描顺序选 `RUNNABLE`；若没有其他候选或扫描再次到 `P`，CPU 可以继续运行同一个进程，但仍经历一次让步与上下文切换链路。
+
+**源码定位**：`/Users/wangjane/Desktop/xv6-riscv/kernel/start.c`、`trap.c`、`trampoline.S`、`proc.c`、`proc.h`、`swtch.S`、`riscv.h`、`memlayout.h`。
+</pre></details></div><footer>LAB0 SYSTEM ATLAS / 离线单文件 · 无外部字体、脚本或网络依赖 · 支持浏览器打印<br>来源：同目录上一级的三份 lab0 Markdown；图示布局不按地址或时间比例绘制。</footer></main><script>const FLOW=[["U", "读取命令", "sh · getcmd → gets → read(0,&c,1)", "用户态每次请求一个字符；ecall 后进入 sh 的内核栈。"], ["S", "等待终端输入", "usertrap → syscall → sys_read → consoleread", "缓冲为空：登记 &cons.r，释放 cons.lock，sleep → sched → swtch。sh 进入 SLEEPING。"], ["IRQ", "字符到达，唤醒 shell", "PLIC → devintr → uartintr → consoleintr", "回车提交输入：cons.w=cons.e；wakeup(&cons.r) 将 sh 标记为 RUNNABLE。中断使用当前被打断执行体的栈。"], ["S", "恢复 sh，返回命令", "scheduler → swtch → consoleread → userret → sret", "调度器再次选中 sh，读取换行结束的输入，回到用户态解析 echo hi。"], ["U", "复制进程", "fork1 → fork → sys_fork → kfork", "复制用户地址空间、trapframe，filedup 增加文件引用。父返回子 PID；子 a0=0。"], ["S", "父等待，子接棒", "父 kwait / 子 scheduler → forkret", "父 sh 睡眠等子进程；子首次运行释放 p->lock，返回用户态继续 runcmd。"], ["S", "装入 echo", "exec → sys_exec → kexec", "替换页表、用户栈、入口 PC；保留 PID、父子关系、ofile 和 cwd。"], ["U", "输出 hi 与换行", "echo → write(1,\"hi\",2) + write(1,\"\\n\",1)", "两次独立系统调用，经 sys_write → filewrite → consolewrite → uartwrite → UART THR。"], ["S", "退出与回收", "kexit → ZOMBIE → wakeup(sh) → kwait", "exit 关闭文件引用；父 wait 回收进程与页表，最后 sh 再次显示提示符。"]];const STEPS=[["用户程序运行", "U", "用户页表", "用户栈", "P 正在执行用户指令，stvec 指向 uservec。"], ["硬件响应中断", "S", "用户页表", "用户栈", "scause=0x8000000000000005；sepc 保存受中断 PC。硬件改变模式，但不切栈、不切页表。"], ["uservec 保存现场", "S", "用户页表", "尚未切换", "sscratch 暂存 a0；通用寄存器写入 P.trapframe。trapframe 无 PTE_U，但 S 态可写。"], ["切换到内核环境", "S", "内核页表", "P 内核栈", "从 trapframe 取 kernel_*；切换 sp、satp 并刷新 TLB，跳入 usertrap。"], ["识别并处理时钟", "S", "内核页表", "P 内核栈", "devintr → clockintr；CPU0 更新 ticks、唤醒等待者，重设 stimecmp，返回 which_dev=2。"], ["yield 主动让步", "S", "内核页表", "P 内核栈 → 调度器栈", "P→RUNNABLE；持 P->lock，sched → swtch 保存内核 context。用户完整现场仍在 trapframe。"], ["调度器选择进程", "S", "内核页表", "调度器栈", "scheduler 可先选 Q，也可再次选择 P。时钟中断不保证一定换到另一个进程。"], ["恢复 P 的续点", "S", "内核页表", "P 内核栈", "再次选中 P 后，swtch 恢复 context；sched、yield 返回并释放 P->lock。"], ["准备返回用户态", "S", "内核页表", "P 内核栈", "prepare_return：stvec=uservec；SPP=0、SPIE=1；sepc=trapframe.epc。时钟中断不做 epc+=4。"], ["userret → sret", "U", "用户页表", "用户栈", "userret 切用户页表、恢复通用寄存器；sret 返回 U 态，从受中断位置继续。"]];
+const nodes=document.getElementById('flow-nodes');FLOW.forEach((n,i)=>{let b=document.createElement('button');b.className='node';b.innerHTML=`<span class="seq">${String(i+1).padStart(2,'0')} →</span><span class="badge ${n[0].toLowerCase()}">${n[0]}</span><h3>${n[1]}</h3><code>${n[2]}</code>`;b.onclick=()=>{document.querySelectorAll('.node').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('flow-detail').textContent=n[3]};nodes.append(b)});nodes.firstChild.click();
+let current=0;const timeline=document.getElementById('timeline');STEPS.forEach((s,i)=>{let b=document.createElement('button');b.setAttribute('aria-label',`步骤 ${i+1}：${s[0]}`);b.onclick=()=>render(i);timeline.append(b)});function render(i){current=i;const s=STEPS[i];document.getElementById('step-label').textContent=`STEP ${String(i).padStart(2,'0')} / 09`;['step-title','mode','pt','stack','step-desc'].forEach((id,k)=>document.getElementById(id).textContent=s[k]);[...timeline.children].forEach((b,k)=>{b.classList.toggle('active',k<=i);b.setAttribute('aria-current',k===i?'step':'false')});document.getElementById('prev').disabled=i===0;document.getElementById('next').disabled=i===9;document.getElementById('counter').textContent=`${i+1} / 10`;}document.getElementById('prev').onclick=()=>render(Math.max(0,current-1));document.getElementById('next').onclick=()=>render(Math.min(9,current+1));document.getElementById('reset').onclick=()=>render(0);render(0);
+const tabs=[...document.querySelectorAll('[data-tab]')];tabs.forEach((b,i)=>{b.onclick=()=>{tabs.forEach(t=>{let active=t===b;t.setAttribute('aria-selected',active);document.getElementById(t.dataset.tab).hidden=!active})};b.onkeydown=e=>{if(['ArrowRight','ArrowLeft'].includes(e.key)){e.preventDefault();let t=tabs[(i+(e.key==='ArrowRight'?1:2))%3];t.click();t.focus()}}});</script></body></html>
