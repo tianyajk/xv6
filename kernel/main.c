@@ -1,6 +1,8 @@
-/* lab1: emit the personalized banner once, then keep the boot hart parked. */
+/* 保留 Lab1 精确 banner；随后进入 Lab2 的单核交互系统。 */
 #include "types.h"
 #include "course_sid.h"
+
+void lab2_main(void) __attribute__((noreturn));
 
 int printf(const char *format, ...);
 
@@ -13,6 +15,5 @@ main(void)
 #else
 #error "This course baseline expects LAB1_BANNER_PROTOCOL == 0"
 #endif
-  for (;;)
-    asm volatile("wfi");
+  lab2_main();
 }

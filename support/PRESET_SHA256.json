@@ -1,0 +1,41 @@
+{
+  "Makefile.upgrade": "dc32079b8f15768b628a5c51fdff3de42aa6079f09abc96628b933d24f82cd3e",
+  "user/printf.c": "8c98780668f6418103de788fa8f2c2d16ed419de95a4484e20fe9531194ccbca",
+  "user/user.ld": "6cae654c2aeb896220bd0e3148071bde950949a431307c38ce53dbd22ad0ea6e",
+  "user/hi.c": "95bddbe0d05247c0f36552d7f7ec82c17d3733cf26ce2e1d28c333048c946b26",
+  "user/user.h": "7bdb892e879d1ef3affc682e3ae9a6c13e965c87b35fb838a413cfa3a48f25d4",
+  "user/sh.c": "2b523461401d5adfb47f51d47df62be8b26e84b91f0b4c877b6805f701d376c3",
+  "user/spin.c": "9330f43452e227ceca5720c1e97f8302e715092cf0ca8bc943312351ae62c0d4",
+  "user/ulib.c": "0bb30cebbd735f730e335e807742e0d20ddf5779d534714f558a606aac2d7a4b",
+  "user/usys.pl": "377fa27e4f7c07436fb487be27ef6c004ba1ddc4f018da0a19139e8946653e58",
+  "kernel/trampoline.S": "92c055df5557217dc6008714c01dc801836a86538a1ab67b617b66bcd873053f",
+  "kernel/fcntl.h": "c8c2a7fa8a9c432be55dcd4bd6db9429c88c3a95cec6f79a576968b36048e166",
+  "kernel/stat.h": "653da9a25a16140de6733b0fa87d2988d0dee962fe75ab5f17fcb50d19e3f8be",
+  "kernel/param.h": "2e231d4c792da80c39668de92d56c28e9d24fd1bdc190435f7ce4025d24bbb59",
+  "kernel/vm.h": "ebd5dfc1a2d28cb16a15dea12ac9467bded6ca4bf652f44b580e4c5bef3fb1a3",
+  "kernel/syscall.h": "cd8b85b251ca89434ce0ce31d86d98521b8ecb3e2b224d95c74db6ee9948525f",
+  "support/inject_uart.py": "f17bdce10a3165e556a5a04c3140012a8b96df34f648ec47bae7c24c61eb0579",
+  "support/tests/bufstorm.c": "f846ec338498258154647a99bb8f1923aeada8cb27fb2e47a08a65ffa809c419",
+  "support/tests/badecall.c": "54c5a2c4914e1d288680e4e075238fbdd3ebc5e5b91fc56ea7baa258a9fdf9d0",
+  "support/tests/README-tests.md": "2bb78f51de241d6670304dc089414c723b4c514715ded44b49bef8c66eea979d",
+  "kernel/course_sid.h": {
+    "sha256": "3953e9c7608625b8566e3098fcfac9b454c71c71e6672708fcdae137bc9217ae",
+    "lf_sha256": "40fe09d4c54071407d2f2ed1218a503bb42766587d7dc0966dc48247a4850a58"
+  },
+  "kernel/kernel.ld": {
+    "sha256": "25c5a562c9eafb77e43b4789b47fba994925eda85e6e4655a4d99811088d14be",
+    "lf_sha256": "3fba526f46dcca1f08220be42fc9591c4efc21fe2324877f0059c1d2fe7f6d08"
+  },
+  "kernel/riscv.h": {
+    "sha256": "a76dfda941fbcbf2b4f844d3f5fde8aa9abf3fca90de2536f568fba11bac3581",
+    "lf_sha256": "16683f8745c1dcf248ae54b909f6f8eeb6aab4a8def8db436faaa1e9c451b8fe"
+  },
+  "kernel/types.h": {
+    "sha256": "17da71c903c0177800c08c96f06dde204bcbdfb2daec002e4c04abe6ce5afcdb",
+    "lf_sha256": "a6ffb66b15fc425ae06c109afb910bd2985b341b373be20d2fbf24a798d9f62c"
+  },
+  "kernel/memlayout.h": {
+    "sha256": "54ed2f8b642dcda18b927610d29267242c12af1fae5625229108100ad0d48708",
+    "lf_sha256": "85f596a0821fab4c15eccc34e294230c96b71731d97d575f842e455abced2d5a"
+  }
+}

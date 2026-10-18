@@ -1,33 +1,18 @@
 #!/usr/bin/env python3
-"""Run the lab1 kernel twice and check exact UART output and trap log."""
+"""Lab2 中的 Lab1 回归：banner 保持精确前缀，随后进入 Shell。"""
 from pathlib import Path
-import subprocess
-import tempfile
-
-ROOT = Path(__file__).resolve().parents[1]
-EXPECTED = (ROOT / "expect_banner.txt").read_bytes()
-CMD = [
-    "qemu-system-riscv64", "-machine", "virt", "-bios", "none",
-    "-kernel", str(ROOT / "kernel/kernel"), "-nographic",
-]
-
-for run in (1, 2):
-    with tempfile.TemporaryDirectory(prefix="lab1-qemu-") as tmp:
-        trap_log = Path(tmp) / "int.log"
-        proc = subprocess.Popen(
-            CMD + ["-d", "int", "-D", str(trap_log)],
-            stdin=subprocess.DEVNULL,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=ROOT,
-        )
-        try:
-            stdout, stderr = proc.communicate(timeout=1)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            stdout, stderr = proc.communicate()
-        trap_data = trap_log.read_bytes() if trap_log.exists() else b""
-        assert stdout == EXPECTED, (run, stdout, EXPECTED)
-        assert stderr == b"", (run, stderr)
-        assert trap_data == b"", (run, trap_data[:200])
-        print(f"PASS QEMU run={run} uart={stdout!r} trap_bytes=0 exit={proc.returncode}")
+import subprocess,tempfile,re
+ROOT=Path(__file__).resolve().parents[1]
+expected=(ROOT/'expect_banner.txt').read_bytes()
+for run in (1,2):
+    with tempfile.TemporaryDirectory(prefix='lab2-boot-') as d:
+        log=Path(d)/'int.log'
+        p=subprocess.Popen(['qemu-system-riscv64','-machine','virt','-bios','none','-kernel',str(ROOT/'kernel/kernel'),'-nographic','-smp','1','-d','int','-D',str(log)],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        try:out,err=p.communicate(timeout=.4)
+        except subprocess.TimeoutExpired:p.kill();out,err=p.communicate()
+        traps=log.read_text()
+        assert out.startswith(expected) and out.count(expected)==1,(run,out)
+        assert b'sh> ' in out and err==b'',(run,out,err)
+        causes=re.findall(r'async:([01]), cause:([0-9a-f]+)',traps)
+        assert all((int(a),int(c,16)) in ((0,8),(1,1),(1,7),(1,9)) for a,c in causes),traps[-2000:]
+        print(f'PASS boot run={run} banner={expected!r} shell=yes unexpected_traps=0')

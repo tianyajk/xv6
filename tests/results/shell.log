@@ -1,0 +1,203 @@
+OSLAB1 sid=2024302111377 mod97=0x46
+sh> hi
+hi: user program running, pid=2
+sh> hi
+hi: user program running, pid=3
+sh> hi
+hi: user program running, pid=4
+sh> badecall
+TEST-1 PASS: unknown syscalls all return -1
+sh> not-found
+exec not-found
+ failed
+sh> bufstorm
+one
+two
+three
+four
+one
+two
+three
+four
+BUFSTORM lines=4 bytes=19
+sh> lab2probe
+PROBE orphan child PASS
+PROBE orphan child PASS
+PROBE orphan child PASS
+PROBE orphan child PASS
+PROBE orphan child PASS
+PROBE orphan child PASS
+PROBE orphan child PASS
+PROBE orphan child PASS
+PROBE nested orphan PASS
+PROBE nested orphan PASS
+PROBE nested orphan PASS
+PROBE nested orphan PASS
+PROBE nested orphan PASS
+PROBE nested orphan PASS
+PROBE nested orphan PASS
+PROBE nested orphan PASS
+user fault pid=55 cause=15 epc=54c
+PROBE core PASS
+PROBE char ready
+ZPROBE char PASS
+PROBE stream ready
+abcdefghijklmnopqrstuvwxyzabcdefPROBE stream bytes=32
+ghijklmnopqrstuvwxyzabcdefghijklPROBE stream bytes=64
+mnopqrstuvwxyzabcdefghijklmnopqrPROBE stream bytes=96
+stuvwxyzabcdefghijklmnopqrstuvwxPROBE stream bytes=128
+yzabcdefghijklmnopqrstuvwxyzabcdPROBE stream bytes=160
+efghijklmnopqrstuvwxyzabcdefghijPROBE stream bytes=192
+klmnopqrstuvwxyzabcdefghijklmnopPROBE stream bytes=224
+qrstuvwxyzabcdefghijklmnopqrstuvPROBE stream bytes=256
+wxyzabcdefghijklmnopqrstuvwxyzabPROBE stream bytes=288
+cdefghijklmnopqrstuvwxyzabcdefghPROBE stream bytes=320
+ijklmnopqrstuvwxyzabcdefghijklmnPROBE stream bytes=352
+opqrstuvwxyzabcdefghijklmnopqrstPROBE stream bytes=384
+uvwxyzabcdefghijklmnopqrstuvwxyzPROBE stream bytes=416
+abcdefghijklmnopqrstuvwxyzabcdefPROBE stream bytes=448
+ghijklmnopqrstuvwxyzabcdefghijklPROBE stream bytes=480
+mnopqrstuvwxyzabcdefghijklmnopqrPROBE stream bytes=512
+stuvwxyzabcdefghijklmnopqrstuvwxPROBE stream bytes=544
+yzabcdefghijklmnopqrstuvwxyzabcdPROBE stream bytes=576
+efghijklmnopqrstuvwxyzabcdefghijPROBE stream bytes=608
+klmnopqrstuvwxyzabcdefghijklmnopPROBE stream bytes=640
+qrstuvwxyzabcdefghijklmnopqrstuvPROBE stream bytes=672
+wxyzabcdefghijklmnopqrstuvwxyzabPROBE stream bytes=704
+cdefghijklmnopqrstuvwxyzabcdefghPROBE stream bytes=736
+ijklmnopqrstuvwxyzabcdefghijklmnPROBE stream bytes=768
+opqrstuvwxyzabcdefghijklmnopqrstPROBE stream bytes=800
+uvwxyzabcdefghijklmnopqrstuvwxyzPROBE stream bytes=832
+abcdefghijklmnopqrstuvwxyzabcdefPROBE stream bytes=864
+ghijklmnopqrstuvwxyzabcdefghijklPROBE stream bytes=896
+mnopqrstuvwxyzabcdefghijklmnopqrPROBE stream bytes=928
+stuvwxyzabcdefghijklmnopqrstuvwxPROBE stream bytes=960
+yzabcdefghijklmnopqrstuvwxyzabcdPROBE stream bytes=992
+efghijklmnopqrstuvwxyzabcdefghijPROBE stream bytes=1024
+PROBE stream PASS bytes=1024
+PROBE overflow ready
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxPROBE overflow PASS capacity=64
+PROBE all PASS
+PROBE interruptible pause ready
+^C
+sh> 
+[lab2 ticks=128 rx=183 dropped=32 wakeups=40]
+spin
+spin 0
+spin 1
+spin 2
+spin 3
+spin 4
+spin 5
+spin 6
+spin 7
+spin 8
+spin 9
+spin 10
+spin 11
+spin 12
+spin 13
+spin 14
+spin 15
+spin 16
+spin 17
+
+[lab2 ticks=140 rx=186 dropped=32 wakeups=41]
+spin 18
+spin 19
+spin 20
+spin 21
+spin 22
+spin 23
+spin 24
+spin 25
+spin 26
+spin 27
+spin 28
+spin 29
+spin 30
+spin 31
+spin 32
+spin 33
+spin 34
+spin 35
+spin 36
+spin 37
+spin 38
+spin 39
+spin 40
+spin 41
+
+[lab2 ticks=150 rx=187 dropped=32 wakeups=41]
+^C
+sh> hi
+hi: user program running, pid=57
+sh> bufstorm
+^C
+sh> bufstorm
+BUFSTORM lines=0 bytes=0
+sh> hi
+hi: user program running, pid=60
+sh> hi
+hi: user program running, pid=61
+sh> hi
+hi: user program running, pid=62
+sh> hi
+hi: user program running, pid=63
+sh> hi
+hi: user program running, pid=64
+sh> hi
+hi: user program running, pid=65
+sh> hi
+hi: user program running, pid=66
+sh> hi
+hi: user program running, pid=67
+sh> hi
+hi: user program running, pid=68
+sh> hi
+hi: user program running, pid=69
+sh> hi
+hi: user program running, pid=70
+sh> hi
+hi: user program running, pid=71
+sh> hi
+hi: user program running, pid=72
+sh> hi
+hi: user program running, pid=73
+sh> hi
+hi: user program running, pid=74
+sh> hi
+hi: user program running, pid=75
+sh> hi
+hi: user program running, pid=76
+sh> hi
+hi: user program running, pid=77
+sh> hi
+hi: user program running, pid=78
+sh> hi
+hi: user program running, pid=79
+sh> hi
+hi: user program running, pid=80
+sh> hi
+hi: user program running, pid=81
+sh> hi
+hi: user program running, pid=82
+sh> hi
+hi: user program running, pid=83
+sh> hi
+hi: user program running, pid=84
+sh> hi
+hi: user program running, pid=85
+sh> hi
+hi: user program running, pid=86
+sh> hi
+hi: user program running, pid=87
+sh> hi
+hi: user program running, pid=88
+sh> hi
+hi: user program running, pid=89
+sh> hi
+hi: user program running, pid=90
+sh> hi
+hi: user program running, pid=91
+sh> 

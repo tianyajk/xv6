@@ -7,3 +7,12 @@ kernel/kernel
 
 # 提交压缩包
 提交-lab1-*.zip
+
+# Lab2 自动生成文件
+user-flat/
+user/usys.S
+kernel/userimg.S
+
+kernel/userentry.h
+tests/__pycache__/
+提交-lab2-*.zip
