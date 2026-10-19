@@ -1,64 +1,90 @@
-# lab1 骨架 Makefile(课程提供;新增源文件时把它加进 OBJS)
-CC   = riscv64-unknown-elf-gcc
-LD   = riscv64-unknown-elf-ld
+# 编译产物集中存放在 build/；源码目录仅保留课程兼容链接。
+.DEFAULT_GOAL := all
+CC = riscv64-unknown-elf-gcc
+LD = riscv64-unknown-elf-ld
+QEMU = qemu-system-riscv64
+OBJCOPY ?= $(shell command -v riscv64-unknown-elf-objcopy 2>/dev/null || command -v riscv64-elf-objcopy 2>/dev/null)
 CFLAGS = -Wall -Werror -O -std=gnu99 -mcmodel=medany -ffreestanding \
          -nostdlib -fno-common -ggdb -march=rv64gc -fno-stack-protector -fno-pie
-QEMU = qemu-system-riscv64
 
-OBJS = kernel/entry.o kernel/start.o kernel/console.o kernel/printf.o kernel/main.o kernel/kalloc3.o kernel/vmcheck3.o kernel/vm2.o kernel/proc2.o kernel/trap2.o kernel/console2.o kernel/syscall2.o kernel/vectors2.o kernel/trampoline.o
+# 课程升级片段保持原文件不变；新构建目标不使用其中的旧输出路径。
+include Makefile.upgrade
+UPROGS += badecall bufstorm lab2probe badaccess memcap vmprobe dump
 
-kernel/kernel: $(OBJS) kernel/kernel.ld
-	$(LD) -T kernel/kernel.ld -o $@ $(OBJS)
+BUILD := build
+GEN := $(BUILD)/generated
+KERNEL_C := start console printf main kalloc3 vmcheck3 vm2 proc2 trap2 console2 syscall2
+KERNEL_OBJS := $(BUILD)/kernel/entry.o $(addprefix $(BUILD)/kernel/,$(KERNEL_C:=.o)) \
+               $(BUILD)/kernel/vectors2.o $(BUILD)/kernel/trampoline.o $(BUILD)/kernel/userimg.o
+USER_LIBS := $(addprefix $(BUILD)/user/,ulib.o printf.o usys.o)
+USER_BINS := $(addprefix $(BUILD)/user/,$(UPROGS:=.bin))
+KHEADERS := $(wildcard kernel/*.h)
+UHEADERS := $(wildcard user/*.h) $(KHEADERS)
 
-%.o: %.c kernel/riscv.h kernel/course_sid.h
-	$(CC) $(CFLAGS) -Ikernel -c -o $@ $<
+.PHONY: all clean clean-extra clean-build
+.NOTPARALLEL:
+.SECONDARY:
+all: kernel/kernel
 
-%.o: %.S
-	$(CC) $(CFLAGS) -Ikernel -c -o $@ $<
+# 固定验收命令仍使用 kernel/kernel，实际 ELF 只存放于 build/。
+kernel/kernel: $(BUILD)/kernel/kernel
+	ln -sfn ../build/kernel/kernel $@
 
-kernel/vm2.o kernel/proc2.o kernel/trap2.o kernel/console2.o kernel/syscall2.o: kernel/lab2.h
+$(BUILD)/kernel/kernel: $(KERNEL_OBJS) kernel/kernel.ld Makefile
+	$(LD) -T kernel/kernel.ld -o $@ $(KERNEL_OBJS)
 
-# 内嵌表首项也保持课程 ABI 的8字节对齐，仅处理派生产物。
-kernel/userimg.o: kernel/userimg.S
-	$(CC) $(CFLAGS) -Ikernel -c -o $@ $<
-	$(OBJCOPY) --set-section-alignment .rodata=8 $@
+$(BUILD)/kernel/%.o: kernel/%.c $(KHEADERS) Makefile Makefile.upgrade
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) -MMD -MP -I$(GEN) -Ikernel -c $< -o $@
 
-# 预置汇编未声明 trampsec 的装载属性；只修正派生目标文件，不改源码。
-kernel/trampoline.o: kernel/trampoline.S kernel/riscv.h kernel/memlayout.h
-	$(CC) $(CFLAGS) -Ikernel -c -o $@ $<
+$(BUILD)/kernel/%.o: kernel/%.S $(KHEADERS) Makefile Makefile.upgrade
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) -MMD -MP -Ikernel -c $< -o $@
+
+$(BUILD)/kernel/trampoline.o: kernel/trampoline.S $(KHEADERS) Makefile Makefile.upgrade
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) -MMD -MP -Ikernel -c $< -o $@
 	$(OBJCOPY) --set-section-flags trampsec=alloc,load,readonly,code --set-section-alignment trampsec=4096 $@
 
-.NOTPARALLEL:
+$(BUILD)/kernel/userimg.o: $(GEN)/userimg.S Makefile
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) -MMD -MP -Ikernel -c $< -o $@
+	$(OBJCOPY) --set-section-alignment .rodata=8 $@
 
-# Lab2：接入课程预置规则，保持原 kernel 目标为默认目标。
-OBJCOPY ?= $(shell command -v riscv64-unknown-elf-objcopy 2>/dev/null || command -v riscv64-elf-objcopy 2>/dev/null)
-include Makefile.upgrade
-OBJS += kernel/userimg.o
-kernel/kernel: kernel/userimg.o
-UPROGS += badecall bufstorm lab2probe badaccess memcap vmprobe dump
-USER_BINS := $(addprefix user-flat/,$(UPROGS:=.bin))
-kernel/userimg.S: $(USER_BINS)
-kernel/userentry.h: $(USER_BINS) tools/user_metadata.py
-	python3 tools/user_metadata.py $(UPROGS)
-kernel/proc2.o: kernel/userentry.h
-# 补齐预置片段的头文件/链接脚本依赖；内核与用户 ABI 同步重建。
-kernel/syscall2.o: kernel/syscall.h
-$(filter %.o,$(OBJS)): kernel/types.h kernel/memlayout.h
-$(USER_BINS): kernel/types.h kernel/syscall.h kernel/stat.h kernel/fcntl.h kernel/param.h kernel/vm.h kernel/course_sid.h user/user.ld
-user/usys.S: kernel/syscall.h
+$(BUILD)/kernel/proc2.o: $(GEN)/userentry.h
 
-# Lab3 只覆盖派生用户构建规则；课程链接脚本与升级片段保持原样。
-$(USER_BINS): user-flat/%.bin: user-flat/%.elf
-	$(OBJCOPY) -O binary $< $@
-user-flat/%.elf: user-flat/%.o user-flat/ulib.o user-flat/printf.o user-flat/usys.o user/lab3.ld
+$(GEN)/usys.S: user/usys.pl kernel/syscall.h
+	mkdir -p $(@D)
+	perl $< > $@.tmp
+	mv $@.tmp $@
+
+$(BUILD)/user/%.o: user/%.c $(UHEADERS) Makefile Makefile.upgrade
+	mkdir -p $(@D)
+	$(CC) $(UFLAGS) -MMD -MP -Iuser -c $< -o $@
+
+$(BUILD)/user/usys.o: $(GEN)/usys.S kernel/syscall.h Makefile Makefile.upgrade
+	mkdir -p $(@D)
+	$(CC) $(UFLAGS) -MMD -MP -Iuser -c $< -o $@
+
+$(BUILD)/user/%.elf: $(BUILD)/user/%.o $(USER_LIBS) user/lab3.ld
 	$(LD) -T user/lab3.ld -o $@ $(filter %.o,$^)
-user-flat/%.o: user/%.c user/user.h kernel/types.h kernel/lab3.h kernel/course_sid.h
-	mkdir -p user-flat
-	$(CC) $(UFLAGS) -Iuser -c $< -o $@
-user-flat/usys.o: user/usys.S
-	mkdir -p user-flat
-	$(CC) $(UFLAGS) -Iuser -c $< -o $@
-$(filter %.o,$(OBJS)): kernel/lab2.h kernel/lab3.h
+
+$(BUILD)/user/%.bin: $(BUILD)/user/%.elf
+	$(OBJCOPY) -O binary $< $@
+
+$(GEN)/userimg.S: $(USER_BINS) tools/embed_users.py Makefile
+	python3 tools/embed_users.py --output $@ --bin-dir $(BUILD)/user $(UPROGS)
+
+$(GEN)/userentry.h: $(USER_BINS) tools/user_metadata.py Makefile
+	python3 tools/user_metadata.py --input-dir $(BUILD)/user --output $@ $(UPROGS)
+
+# 只清理确定的生成目录；固定的 clean/qemu 规则原样保留。
+clean: clean-build
+clean-extra: clean
+clean-build:
+	python3 -c "from pathlib import Path; import shutil; p=Path('build'); shutil.rmtree(p) if p.exists() else None; Path('kernel/userentry.h').unlink(missing_ok=True)"
+
+-include $(wildcard $(BUILD)/kernel/*.d $(BUILD)/user/*.d)
 
 # 验收环境固定(排雷环节禁止改动本行以下内容)
 qemu: kernel/kernel

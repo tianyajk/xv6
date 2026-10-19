@@ -1,5 +1,5 @@
 #include "lab2.h"
-#include "userentry.h"
+#include <userentry.h> /* 只使用构建目录中的生成元数据，避免旧文件遮蔽。 */
 struct process procs[NPROC2], *current;
 static int nextpid;
 extern unsigned char _uprog_table[];

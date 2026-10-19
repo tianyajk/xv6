@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """生成真实 ELF 入口、段范围和页权限；保留预置内嵌表 ABI。"""
 from pathlib import Path
-import struct,sys
+import struct,argparse
+parser=argparse.ArgumentParser()
+parser.add_argument('--input-dir',default='build/user')
+parser.add_argument('--output',default='build/generated/userentry.h')
+parser.add_argument('programs',nargs='+')
+args=parser.parse_args()
 out=['/* 自动生成的用户 ELF 元数据。 */',
      'struct image_section3 {uint64 va,size; int flags;};']
 rows=[]
-for name in sys.argv[1:]:
-    b=Path('user-flat',name+'.elf').read_bytes()
+for name in args.programs:
+    b=Path(args.input_dir,name+'.elf').read_bytes()
     assert b[:6]==b'\x7fELF\x02\x01'
     entry=struct.unpack_from('<Q',b,24)[0]
     shoff=struct.unpack_from('<Q',b,40)[0]
@@ -26,4 +31,6 @@ for name in sys.argv[1:]:
     rows.append(f'  {{"{name}",{entry}UL,{end}UL,sections_{name},{len(sections)}}},')
 out.append('static const struct {const char *name; uint64 entry,end; const struct image_section3 *sections; uint64 nsections;} user_entries[] = {')
 out+=rows+['};']
-Path('kernel/userentry.h').write_text('\n'.join(out)+'\n')
+output=Path(args.output)
+output.parent.mkdir(parents=True,exist_ok=True)
+output.write_text('\n'.join(out)+'\n')

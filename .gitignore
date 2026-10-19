@@ -16,3 +16,6 @@ kernel/userimg.S
 kernel/userentry.h
 tests/__pycache__/
 提交-lab2-*.zip
+
+# 集中存放的构建产物
+/build/
