@@ -5,7 +5,7 @@ CFLAGS = -Wall -Werror -O -std=gnu99 -mcmodel=medany -ffreestanding \
          -nostdlib -fno-common -ggdb -march=rv64gc -fno-stack-protector -fno-pie
 QEMU = qemu-system-riscv64
 
-OBJS = kernel/entry.o kernel/start.o kernel/console.o kernel/printf.o kernel/main.o kernel/vm2.o kernel/proc2.o kernel/trap2.o kernel/console2.o kernel/syscall2.o kernel/vectors2.o kernel/trampoline.o
+OBJS = kernel/entry.o kernel/start.o kernel/console.o kernel/printf.o kernel/main.o kernel/kalloc3.o kernel/vmcheck3.o kernel/vm2.o kernel/proc2.o kernel/trap2.o kernel/console2.o kernel/syscall2.o kernel/vectors2.o kernel/trampoline.o
 
 kernel/kernel: $(OBJS) kernel/kernel.ld
 	$(LD) -T kernel/kernel.ld -o $@ $(OBJS)
@@ -35,7 +35,7 @@ OBJCOPY ?= $(shell command -v riscv64-unknown-elf-objcopy 2>/dev/null || command
 include Makefile.upgrade
 OBJS += kernel/userimg.o
 kernel/kernel: kernel/userimg.o
-UPROGS += badecall bufstorm lab2probe
+UPROGS += badecall bufstorm lab2probe badaccess memcap vmprobe dump
 USER_BINS := $(addprefix user-flat/,$(UPROGS:=.bin))
 kernel/userimg.S: $(USER_BINS)
 kernel/userentry.h: $(USER_BINS) tools/user_metadata.py
@@ -46,6 +46,19 @@ kernel/syscall2.o: kernel/syscall.h
 $(filter %.o,$(OBJS)): kernel/types.h kernel/memlayout.h
 $(USER_BINS): kernel/types.h kernel/syscall.h kernel/stat.h kernel/fcntl.h kernel/param.h kernel/vm.h kernel/course_sid.h user/user.ld
 user/usys.S: kernel/syscall.h
+
+# Lab3 只覆盖派生用户构建规则；课程链接脚本与升级片段保持原样。
+$(USER_BINS): user-flat/%.bin: user-flat/%.elf
+	$(OBJCOPY) -O binary $< $@
+user-flat/%.elf: user-flat/%.o user-flat/ulib.o user-flat/printf.o user-flat/usys.o user/lab3.ld
+	$(LD) -T user/lab3.ld -o $@ $(filter %.o,$^)
+user-flat/%.o: user/%.c user/user.h kernel/types.h kernel/lab3.h kernel/course_sid.h
+	mkdir -p user-flat
+	$(CC) $(UFLAGS) -Iuser -c $< -o $@
+user-flat/usys.o: user/usys.S
+	mkdir -p user-flat
+	$(CC) $(UFLAGS) -Iuser -c $< -o $@
+$(filter %.o,$(OBJS)): kernel/lab2.h kernel/lab3.h
 
 # 验收环境固定(排雷环节禁止改动本行以下内容)
 qemu: kernel/kernel

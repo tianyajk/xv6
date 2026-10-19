@@ -22,6 +22,10 @@ void consoleintr2(void) {
     if (c == 16) {
       printf("\n[lab2 ticks=%ld rx=%ld dropped=%ld wakeups=%ld]\n", (long)ticks,
              (long)rx_irqs, (long)rx_dropped, (long)rx_wakeups);
+      struct vmstats3 stats;
+      kstats3(&stats);
+      printf("[vm3 used=%ld free=%ld limit=%ld]\n", (long)stats.used, (long)stats.free,
+             (long)stats.limit);
       continue;
     }
     if (c == 3) {
@@ -57,7 +61,7 @@ void consoleintr2(void) {
   }
 }
 int console_read2(uint64 dst, int n) {
-  if (n < 0 || dst > USIZE || (uint64)n > USIZE - dst)
+  if (n < 0 || vm_check3(current->pagetable, dst, (uint64)n, 1) < 0)
     return -1;
   if (n == 0)
     return 0;

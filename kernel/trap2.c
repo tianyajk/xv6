@@ -42,13 +42,13 @@ void kerneltrap(void) {
 }
 uint64 usertrap(void) {
   w_stvec((uint64)kernelvec);
-  current->tf.epc = r_sepc();
+  current->tf->epc = r_sepc();
   if (r_scause() == 8) {
-    current->tf.epc += 4;
+    current->tf->epc += 4;
     syscall2();
   } else if (!devintr2()) {
     printf("user fault pid=%d cause=%ld epc=%lx\n", current->pid, (long)r_scause(),
-           current->tf.epc);
+           current->tf->epc);
     proc_exit(-1);
   }
   while (current->killed)

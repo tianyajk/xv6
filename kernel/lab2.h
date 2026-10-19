@@ -5,7 +5,6 @@
 #include "memlayout.h"
 #include "course_sid.h"
 #define NPROC2 8
-#define USIZE (128 * 1024)
 /* 与预置 trampoline.S 的字节偏移逐项一致。 */
 struct trapframe {
   uint64 kernel_satp, kernel_sp, kernel_trap, epc, kernel_hartid;
@@ -19,10 +18,9 @@ struct process {
   int pid, parent, status, killed;
   int reap_owner, pending_reap;
   enum pstate state;
-  uint64 waitaddr, heap;
-  struct trapframe tf __attribute__((aligned(4096)));
-  uint64 pt[5][512] __attribute__((aligned(4096)));
-  unsigned char mem[USIZE] __attribute__((aligned(4096)));
+  uint64 waitaddr, heap, heap_base;
+  struct trapframe *tf;
+  pagetable_t pagetable;
   unsigned char stack[8192] __attribute__((aligned(16)));
 };
 extern struct process procs[NPROC2], *current;
@@ -36,7 +34,7 @@ void panic2(const char *) __attribute__((noreturn));
 int printf(const char *, ...);
 void uartputc_sync(char);
 void vm_init(void);
-void vm_process(struct process *);
+int vm_process(struct process *);
 int copyin2(void *, uint64, int);
 int copyout2(uint64, const void *, int);
 int copystr2(char *, uint64, int);
@@ -55,4 +53,5 @@ void consoleintr2(void);
 int console_read2(uint64, int);
 void syscall2(void);
 void lab2_main(void) __attribute__((noreturn));
+#include "lab3.h"
 #endif
